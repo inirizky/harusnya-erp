@@ -5,14 +5,11 @@ import {
   TrendingDown,
   Plus,
   Search,
-  ArrowUpRight,
-  ArrowDownRight,
-  Landmark,
   ArrowRight,
+  Landmark,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -30,34 +27,36 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PageHeader, StatsGrid, StatusBadge } from "@/components/dashboard";
+import type { StatCardData } from "@/components/dashboard";
 
-const stats = [
+const stats: StatCardData[] = [
   {
     title: "Total Revenue",
     value: "Rp 2.45 M",
     change: "+12.5%",
-    trend: "up" as const,
+    trend: "up",
     icon: Banknote,
   },
   {
     title: "Accounts Receivable",
     value: "Rp 523.8 Jt",
     change: "+8.2%",
-    trend: "up" as const,
+    trend: "up",
     icon: CreditCard,
   },
   {
     title: "Accounts Payable",
     value: "Rp 312.4 Jt",
     change: "-3.1%",
-    trend: "down" as const,
+    trend: "down",
     icon: TrendingDown,
   },
   {
     title: "Cash Balance",
     value: "Rp 1.89 M",
     change: "+Rp 45 Jt",
-    trend: "up" as const,
+    trend: "up",
     icon: Landmark,
   },
 ];
@@ -73,13 +72,10 @@ const journalEntries = [
   { id: "JR-2026-0694", date: "24 Jun 2026", description: "Tax Payment - PPh 21", account: "Tax Payable", debit: 18300000, credit: 0, status: "Posted" as const },
 ];
 
-const statusStyle = (status: string) => {
-  const styles: Record<string, string> = {
-    Posted: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    Pending: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    Draft: "bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-400",
-  };
-  return styles[status] || "";
+const statusStyles: Record<string, string> = {
+  Posted: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Pending: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Draft: "bg-slate-100 text-slate-700 dark:bg-slate-800/50 dark:text-slate-400",
 };
 
 const formatCurrency = (amount: number) => {
@@ -101,54 +97,25 @@ export default function AccountingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Accounting</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage journal entries, account balances, and financial transactions.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Search className="mr-2 h-4 w-4" />
-            Find Entry
-          </Button>
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            New Entry
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Accounting"
+        description="Manage journal entries, account balances, and financial transactions."
+        actions={
+          <>
+            <Button variant="outline" size="sm">
+              <Search className="mr-2 h-4 w-4" />
+              Find Entry
+            </Button>
+            <Button size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              New Entry
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.title}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {s.title}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <s.icon className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{s.value}</div>
-              <div className="mt-1 flex items-center gap-1 text-xs">
-                {s.trend === "up" ? (
-                  <ArrowUpRight className="h-3 w-3 text-emerald-500" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3 text-red-500" />
-                )}
-                <span className={s.trend === "up" ? "text-emerald-500" : "text-red-500"}>
-                  {s.change}
-                </span>
-                <span className="text-muted-foreground">vs last month</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <StatsGrid stats={stats} />
 
       {/* Journal Entries + Account Balances */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -205,9 +172,7 @@ export default function AccountingPage() {
                       {entry.credit > 0 ? formatCurrency(entry.credit) : "-"}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className={`text-xs font-medium ${statusStyle(entry.status)}`}>
-                        {entry.status}
-                      </Badge>
+                      <StatusBadge status={entry.status} statusStyles={statusStyles} />
                     </TableCell>
                   </TableRow>
                 ))}

@@ -5,12 +5,9 @@ import {
   TrendingUp,
   Plus,
   Search,
-  ArrowUpRight,
-  ArrowDownRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -27,36 +24,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { PageHeader, StatsGrid, StatusBadge, SidebarList } from "@/components/dashboard";
+import type { StatCardData, SidebarItem } from "@/components/dashboard";
 
-const stats = [
+const stats: StatCardData[] = [
   {
     title: "Total Products",
     value: "2,847",
     change: "+124",
-    trend: "up" as const,
+    trend: "up",
     icon: Package,
   },
   {
     title: "Warehouses",
     value: "4",
     change: "0",
-    trend: "up" as const,
+    trend: "up",
     icon: Warehouse,
   },
   {
     title: "Low Stock Items",
     value: "23",
     change: "+5",
-    trend: "up" as const,
+    trend: "up",
     icon: AlertTriangle,
   },
   {
     title: "Stock Turnover",
     value: "4.8x",
     change: "+0.6x",
-    trend: "up" as const,
+    trend: "up",
     icon: TrendingUp,
   },
 ];
@@ -72,13 +70,10 @@ const inventory = [
   { sku: "HDD-WD-008", name: "HDD External WD 2TB", category: "Penyimpanan", stock: 4, minStock: 15, warehouse: "Gudang 3", status: "Kritis" as const },
 ];
 
-const statusStyle = (status: string) => {
-  const styles: Record<string, string> = {
-    Aman: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    Menipis: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    Kritis: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  };
-  return styles[status] || "";
+const statusStyles: Record<string, string> = {
+  Aman: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Menipis: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Kritis: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 const stockLevel = (stock: number, minStock: number) => {
@@ -86,7 +81,7 @@ const stockLevel = (stock: number, minStock: number) => {
   return Math.min(Math.round((stock / (minStock * 3)) * 100), 100);
 };
 
-const categories = [
+const categories: SidebarItem[] = [
   { name: "Elektronik", count: 845, value: "Rp 2.1 M" },
   { name: "Jaringan", count: 523, value: "Rp 1.4 M" },
   { name: "Server", count: 167, value: "Rp 3.2 M" },
@@ -98,51 +93,25 @@ export default function InventoryPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Inventory</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Track stock levels, manage warehouses, and monitor inventory movements.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Search className="mr-2 h-4 w-4" />
-            Scan Barcode
-          </Button>
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Inventory"
+        description="Track stock levels, manage warehouses, and monitor inventory movements."
+        actions={
+          <>
+            <Button variant="outline" size="sm">
+              <Search className="mr-2 h-4 w-4" />
+              Scan Barcode
+            </Button>
+            <Button size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.title}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {s.title}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <s.icon className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{s.value}</div>
-              <div className="mt-1 flex items-center gap-1 text-xs">
-                {s.trend === "up" ? (
-                  <ArrowUpRight className="h-3 w-3" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3" />
-                )}
-                <span className="text-muted-foreground">{s.change} vs last month</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <StatsGrid stats={stats} />
 
       {/* Inventory Table + Categories */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -202,9 +171,7 @@ export default function InventoryPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">{item.warehouse}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className={`text-xs font-medium ${statusStyle(item.status)}`}>
-                        {item.status}
-                      </Badge>
+                      <StatusBadge status={item.status} statusStyles={statusStyles} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -214,30 +181,11 @@ export default function InventoryPage() {
         </Card>
 
         {/* Categories */}
-        <Card className="lg:col-span-1">
-          <CardHeader className="pb-3">
-            <CardTitle>Categories</CardTitle>
-            <CardDescription>Products grouped by category</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {categories.map((cat) => (
-                <div key={cat.name} className="flex items-center gap-3">
-                  <Avatar className="h-9 w-9 rounded-lg border">
-                    <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-xs font-medium">
-                      {cat.name.slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{cat.name}</p>
-                    <p className="text-xs text-muted-foreground">{cat.count} items</p>
-                  </div>
-                  <span className="text-sm font-medium">{cat.value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <SidebarList
+          items={categories}
+          title="Categories"
+          description="Products grouped by category"
+        />
       </div>
     </div>
   );
