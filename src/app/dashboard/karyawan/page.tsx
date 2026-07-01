@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Users,
   UserCheck,
@@ -27,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { EmployeeForm } from "@/components/forms/employee-form";
 import { PageHeader, StatsGrid, StatusBadge, ActivityFeed } from "@/components/dashboard";
 import type { StatCardData, Activity } from "@/components/dashboard";
 
@@ -61,20 +65,30 @@ const stats: StatCardData[] = [
   },
 ];
 
-const employees = [
-  { id: "EMP-001", name: "Budi Santoso", position: "Senior Developer", department: "IT", email: "budi.s@company.com", joinDate: "12 Jan 2022", status: "Active" as const },
-  { id: "EMP-002", name: "Siti Rahma", position: "Finance Manager", department: "Finance", email: "siti.r@company.com", joinDate: "5 Mar 2021", status: "Active" as const },
-  { id: "EMP-003", name: "Ahmad Fauzi", position: "Marketing Lead", department: "Marketing", email: "ahmad.f@company.com", joinDate: "18 Jul 2023", status: "Active" as const },
-  { id: "EMP-004", name: "Dewi Lestari", position: "HR Specialist", department: "HR", email: "dewi.l@company.com", joinDate: "22 Sep 2022", status: "On Leave" as const },
-  { id: "EMP-005", name: "Rudi Hartono", position: "Operations Manager", department: "Operations", email: "rudi.h@company.com", joinDate: "3 Feb 2020", status: "Active" as const },
-  { id: "EMP-006", name: "Linda Wijaya", position: "Product Designer", department: "Design", email: "linda.w@company.com", joinDate: "15 Nov 2023", status: "Active" as const },
-  { id: "EMP-007", name: "Eko Prasetyo", position: "Sales Executive", department: "Sales", email: "eko.p@company.com", joinDate: "8 Apr 2024", status: "Active" as const },
-  { id: "EMP-008", name: "Maya Kusuma", position: "QA Engineer", department: "IT", email: "maya.k@company.com", joinDate: "27 Jun 2023", status: "Active" as const },
-  { id: "EMP-009", name: "Hendra Gunawan", position: "Accountant", department: "Finance", email: "hendra.g@company.com", joinDate: "14 May 2021", status: "Active" as const },
-  { id: "EMP-010", name: "Ratna Sari", position: "Legal Counsel", department: "Legal", email: "ratna.s@company.com", joinDate: "9 Aug 2022", status: "Active" as const },
-  { id: "EMP-011", name: "Joko Widodo", position: "Warehouse Staff", department: "Operations", email: "joko.w@company.com", joinDate: "1 Oct 2020", status: "Terminated" as const },
-  { id: "EMP-012", name: "Sri Mulyani", position: "Customer Service", department: "Support", email: "sri.m@company.com", joinDate: "20 Dec 2023", status: "Active" as const },
+const employees: Employee[] = [
+  { id: "EMP-001", name: "Budi Santoso", position: "Senior Developer", department: "IT", email: "budi.s@company.com", joinDate: "12 Jan 2022", status: "Active" },
+  { id: "EMP-002", name: "Siti Rahma", position: "Finance Manager", department: "Finance", email: "siti.r@company.com", joinDate: "5 Mar 2021", status: "Active" },
+  { id: "EMP-003", name: "Ahmad Fauzi", position: "Marketing Lead", department: "Marketing", email: "ahmad.f@company.com", joinDate: "18 Jul 2023", status: "Active" },
+  { id: "EMP-004", name: "Dewi Lestari", position: "HR Specialist", department: "HR", email: "dewi.l@company.com", joinDate: "22 Sep 2022", status: "On Leave" },
+  { id: "EMP-005", name: "Rudi Hartono", position: "Operations Manager", department: "Operations", email: "rudi.h@company.com", joinDate: "3 Feb 2020", status: "Active" },
+  { id: "EMP-006", name: "Linda Wijaya", position: "Product Designer", department: "Design", email: "linda.w@company.com", joinDate: "15 Nov 2023", status: "Active" },
+  { id: "EMP-007", name: "Eko Prasetyo", position: "Sales Executive", department: "Sales", email: "eko.p@company.com", joinDate: "8 Apr 2024", status: "Active" },
+  { id: "EMP-008", name: "Maya Kusuma", position: "QA Engineer", department: "IT", email: "maya.k@company.com", joinDate: "27 Jun 2023", status: "Active" },
+  { id: "EMP-009", name: "Hendra Gunawan", position: "Accountant", department: "Finance", email: "hendra.g@company.com", joinDate: "14 May 2021", status: "Active" },
+  { id: "EMP-010", name: "Ratna Sari", position: "Legal Counsel", department: "Legal", email: "ratna.s@company.com", joinDate: "9 Aug 2022", status: "Active" },
+  { id: "EMP-011", name: "Joko Widodo", position: "Warehouse Staff", department: "Operations", email: "joko.w@company.com", joinDate: "1 Oct 2020", status: "Terminated" },
+  { id: "EMP-012", name: "Sri Mulyani", position: "Customer Service", department: "Support", email: "sri.m@company.com", joinDate: "20 Dec 2023", status: "Active" },
 ];
+
+type Employee = {
+  id: string;
+  name: string;
+  position: string;
+  department: string;
+  email: string;
+  joinDate: string;
+  status: string;
+};
 
 const statusStyles: Record<string, string> = {
   Active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
@@ -102,6 +116,12 @@ const recentActivities: Activity[] = [
 ];
 
 export default function EmployeesPage() {
+  const [employeeList, setEmployeeList] = useState(employees);
+
+  function handleEmployeeCreated(employee: Employee) {
+    setEmployeeList((prev) => [employee, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -114,10 +134,12 @@ export default function EmployeesPage() {
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Employee
-            </Button>
+            <EmployeeForm onEmployeeCreated={handleEmployeeCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Employee
+              </Button>
+            </EmployeeForm>
           </>
         }
       />
@@ -182,7 +204,7 @@ export default function EmployeesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {employees.map((emp) => (
+                {employeeList.map((emp) => (
                   <TableRow key={emp.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">

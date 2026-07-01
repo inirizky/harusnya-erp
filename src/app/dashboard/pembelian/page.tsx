@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Truck,
   ClipboardList,
@@ -18,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
+import { PurchaseOrderForm } from "@/components/forms/purchase-order-form";
 import { PageHeader, StatsGrid, StatusBadge, SidebarList } from "@/components/dashboard";
 import type { StatCardData, SidebarItem } from "@/components/dashboard";
 
@@ -76,7 +80,23 @@ const topSuppliers: SidebarItem[] = [
   { name: "PT Server Utama", count: "8 orders", value: "Rp 112 Jt" },
 ];
 
+type PurchaseOrder = (typeof purchaseOrders)[0];
+
 export default function PurchasingPage() {
+  const [poList, setPOList] = useState(purchaseOrders);
+
+  function handlePOCreated(po: { id: string; supplier: string; total: string; eta: string; status: string }) {
+    const newPO: PurchaseOrder = {
+      id: po.id,
+      supplier: po.supplier,
+      items: 0,
+      total: po.total,
+      status: po.status as any,
+      eta: po.eta,
+    };
+    setPOList((prev) => [newPO, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -89,10 +109,12 @@ export default function PurchasingPage() {
               <Search className="mr-2 h-4 w-4" />
               Search PO
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              New PO
-            </Button>
+            <PurchaseOrderForm onPOCreated={handlePOCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                New PO
+              </Button>
+            </PurchaseOrderForm>
           </>
         }
       />
@@ -125,7 +147,7 @@ export default function PurchasingPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {purchaseOrders.map((po) => (
+                {poList.map((po) => (
                   <TableRow key={po.id}>
                     <TableCell className="font-medium">{po.id}</TableCell>
                     <TableCell className="max-w-[150px] truncate">{po.supplier}</TableCell>
