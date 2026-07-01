@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   ShoppingCart,
   TrendingUp,
@@ -25,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { InvoiceForm } from "@/components/forms/invoice-form";
 import { PageHeader, StatsGrid, StatusBadge, ActivityFeed } from "@/components/dashboard";
 import type { StatCardData, Activity } from "@/components/dashboard";
 
@@ -59,16 +63,25 @@ const stats: StatCardData[] = [
   },
 ];
 
-const invoices = [
-  { id: "INV-2026-001", customer: "PT Maju Jaya", date: "28 Jun 2026", amount: "Rp 28.500.000", status: "Lunas" as const, payment: "Transfer" },
-  { id: "INV-2026-002", customer: "CV Sukses Abadi", date: "27 Jun 2026", amount: "Rp 15.200.000", status: "Tertunda" as const, payment: "Credit" },
-  { id: "INV-2026-003", customer: "UD Berkah Utama", date: "26 Jun 2026", amount: "Rp 8.750.000", status: "Lunas" as const, payment: "Transfer" },
-  { id: "INV-2026-004", customer: "PT Indo Makmur Sentosa", date: "25 Jun 2026", amount: "Rp 12.300.000", status: "Diproses" as const, payment: "Transfer" },
-  { id: "INV-2026-005", customer: "CV Bintang Terang", date: "24 Jun 2026", amount: "Rp 9.100.000", status: "Lunas" as const, payment: "Cash" },
-  { id: "INV-2026-006", customer: "PT Sinar Jaya Abadi", date: "23 Jun 2026", amount: "Rp 35.000.000", status: "Dibatalkan" as const, payment: "Credit" },
-  { id: "INV-2026-007", customer: "CV Karya Mandiri", date: "22 Jun 2026", amount: "Rp 6.450.000", status: "Lunas" as const, payment: "Transfer" },
-  { id: "INV-2026-008", customer: "UD Sumber Rejeki", date: "21 Jun 2026", amount: "Rp 22.800.000", status: "Diproses" as const, payment: "Transfer" },
+const invoices: Invoice[] = [
+  { id: "INV-2026-001", customer: "PT Maju Jaya", date: "28 Jun 2026", amount: "Rp 28.500.000", status: "Lunas", payment: "Transfer" },
+  { id: "INV-2026-002", customer: "CV Sukses Abadi", date: "27 Jun 2026", amount: "Rp 15.200.000", status: "Tertunda", payment: "Credit" },
+  { id: "INV-2026-003", customer: "UD Berkah Utama", date: "26 Jun 2026", amount: "Rp 8.750.000", status: "Lunas", payment: "Transfer" },
+  { id: "INV-2026-004", customer: "PT Indo Makmur Sentosa", date: "25 Jun 2026", amount: "Rp 12.300.000", status: "Diproses", payment: "Transfer" },
+  { id: "INV-2026-005", customer: "CV Bintang Terang", date: "24 Jun 2026", amount: "Rp 9.100.000", status: "Lunas", payment: "Cash" },
+  { id: "INV-2026-006", customer: "PT Sinar Jaya Abadi", date: "23 Jun 2026", amount: "Rp 35.000.000", status: "Dibatalkan", payment: "Credit" },
+  { id: "INV-2026-007", customer: "CV Karya Mandiri", date: "22 Jun 2026", amount: "Rp 6.450.000", status: "Lunas", payment: "Transfer" },
+  { id: "INV-2026-008", customer: "UD Sumber Rejeki", date: "21 Jun 2026", amount: "Rp 22.800.000", status: "Diproses", payment: "Transfer" },
 ];
+
+type Invoice = {
+  id: string;
+  customer: string;
+  date: string;
+  amount: string;
+  status: string;
+  payment: string;
+};
 
 const statusStyles: Record<string, string> = {
   Lunas: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
@@ -86,6 +99,12 @@ const recentActivities: Activity[] = [
 ];
 
 export default function SalesPage() {
+  const [invoiceList, setInvoiceList] = useState(invoices);
+
+  function handleInvoiceCreated(invoice: typeof invoices[0]) {
+    setInvoiceList((prev) => [invoice, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -98,10 +117,12 @@ export default function SalesPage() {
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              New Invoice
-            </Button>
+            <InvoiceForm onInvoiceCreated={handleInvoiceCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                New Invoice
+              </Button>
+            </InvoiceForm>
           </>
         }
       />
@@ -150,7 +171,7 @@ export default function SalesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {invoices.map((inv) => (
+                {invoiceList.map((inv) => (
                   <TableRow key={inv.id}>
                     <TableCell className="font-medium">{inv.id}</TableCell>
                     <TableCell className="max-w-[150px] truncate">{inv.customer}</TableCell>

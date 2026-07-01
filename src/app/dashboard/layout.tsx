@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Toaster } from "@/components/toaster";
 
 export default function DashboardLayout({
   children,
@@ -73,6 +74,7 @@ export default function DashboardLayout({
         </header>
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </SidebarInset>
+      <Toaster />
     </SidebarProvider>
   );
 }
