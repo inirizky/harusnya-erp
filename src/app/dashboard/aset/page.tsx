@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Building2,
   DollarSign,
@@ -27,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AssetForm } from "@/components/forms/asset-form";
 import { PageHeader, StatsGrid, StatusBadge, ActivityFeed, SidebarList } from "@/components/dashboard";
 import type { StatCardData, Activity, SidebarItem } from "@/components/dashboard";
 
@@ -103,7 +107,26 @@ const recentActivities: Activity[] = [
   { user: "Dewi Lestari", action: "Audited asset inventory in Data Center", time: "3 days ago", avatar: "DL" },
 ];
 
+type Asset = (typeof assets)[0];
+
 export default function AssetsPage() {
+  const [assetList, setAssetList] = useState(assets);
+
+  function handleAssetCreated(asset: { id: string; name: string; category: string; purchaseDate: string; purchaseValue: number; depreciationRate: number; location: string; status: string; currentValue: string; depreciation: string }) {
+    const newAsset: Asset = {
+      id: asset.id,
+      name: asset.name,
+      category: asset.category,
+      purchaseDate: new Date(asset.purchaseDate).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" }),
+      purchaseValue: `Rp ${Number(asset.purchaseValue).toLocaleString("id-ID")}`,
+      currentValue: asset.currentValue,
+      depreciation: asset.depreciation,
+      status: asset.status as any,
+      location: asset.location,
+    };
+    setAssetList((prev) => [newAsset, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -116,10 +139,12 @@ export default function AssetsPage() {
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Asset
-            </Button>
+            <AssetForm onAssetCreated={handleAssetCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Asset
+              </Button>
+            </AssetForm>
           </>
         }
       />
@@ -188,7 +213,7 @@ export default function AssetsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {assets.map((asset) => (
+                {assetList.map((asset) => (
                   <TableRow key={asset.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

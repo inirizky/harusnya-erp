@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Receipt,
   Banknote,
@@ -27,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { JournalEntryForm } from "@/components/forms/journal-entry-form";
 import { PageHeader, StatsGrid, StatusBadge } from "@/components/dashboard";
 import type { StatCardData } from "@/components/dashboard";
 
@@ -93,7 +97,24 @@ const accountBalances = [
   { name: "Retained Earnings", balance: 785000000, change: "+5.7%" },
 ];
 
+type JournalEntry = (typeof journalEntries)[0];
+
 export default function AccountingPage() {
+  const [entryList, setEntryList] = useState(journalEntries);
+
+  function handleEntryCreated(entry: { id: string; date: string; description: string; account: string; entryType: "debit" | "credit"; amount: number; status: string }) {
+    const newEntry: JournalEntry = {
+      id: entry.id,
+      date: entry.date,
+      description: entry.description,
+      account: entry.account,
+      debit: entry.entryType === "debit" ? entry.amount : 0,
+      credit: entry.entryType === "credit" ? entry.amount : 0,
+      status: entry.status as any,
+    };
+    setEntryList((prev) => [newEntry, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -106,10 +127,12 @@ export default function AccountingPage() {
               <Search className="mr-2 h-4 w-4" />
               Find Entry
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              New Entry
-            </Button>
+            <JournalEntryForm onEntryCreated={handleEntryCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                New Entry
+              </Button>
+            </JournalEntryForm>
           </>
         }
       />
@@ -157,7 +180,7 @@ export default function AccountingPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {journalEntries.map((entry) => (
+                {entryList.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell className="font-medium text-xs">{entry.id}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{entry.date}</TableCell>
