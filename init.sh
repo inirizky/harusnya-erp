@@ -15,10 +15,7 @@ echo "==> Syncing dependencies"
 "${INSTALL_CMD[@]}"
 
 echo "==> Running baseline verification"
-# NOTE: Commented out until test infrastructure is set up (feature infra-001)
-# Currently no test script exists in package.json
-# "${VERIFY_CMD[@]}"
-echo "    (no tests configured yet - skipping verification)"
+"${VERIFY_CMD[@]}"
 
 echo "==> Startup command"
 printf '    %q' "${START_CMD[@]}"

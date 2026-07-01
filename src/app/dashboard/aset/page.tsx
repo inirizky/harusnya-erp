@@ -6,11 +6,7 @@ import {
   Search,
   Download,
   Plus,
-  ArrowUpRight,
-  ArrowDownRight,
   CalendarDays,
-  Tag,
-  Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,35 +27,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PageHeader, StatsGrid, StatusBadge, ActivityFeed, SidebarList } from "@/components/dashboard";
+import type { StatCardData, Activity, SidebarItem } from "@/components/dashboard";
 
-const stats = [
+const stats: StatCardData[] = [
   {
     title: "Total Assets",
     value: "156",
     change: "+4",
-    trend: "up" as const,
+    trend: "up",
     icon: Building2,
   },
   {
     title: "Total Value",
     value: "Rp 48.2 M",
     change: "+Rp 1.8 M",
-    trend: "up" as const,
+    trend: "up",
     icon: DollarSign,
   },
   {
     title: "Monthly Depreciation",
     value: "Rp 2.1 M",
     change: "-Rp 0.3 M",
-    trend: "down" as const,
+    trend: "down",
     icon: TrendingDown,
   },
   {
     title: "Asset Categories",
     value: "9",
     change: "0",
-    trend: "up" as const,
+    trend: "up",
     icon: LayoutGrid,
   },
 ];
@@ -79,29 +76,26 @@ const assets = [
   { id: "AST-012", name: "VMware vSphere License", category: "Software", purchaseDate: "15 Jan 2025", purchaseValue: "Rp 9.600.000", currentValue: "Rp 9.600.000", depreciation: "0%", status: "Active" as const, location: "IT Dept" },
 ];
 
-const statusStyle = (status: string) => {
-  const styles: Record<string, string> = {
-    Active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    Maintenance: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    Disposed: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  };
-  return styles[status] || "";
+const statusStyles: Record<string, string> = {
+  Active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Maintenance: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Disposed: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
-const categories = [
-  { name: "Server", count: 12, value: "Rp 8.4 M", icon: "SR" },
-  { name: "Vehicle", count: 8, value: "Rp 437.6 M", icon: "VH" },
-  { name: "Office Equipment", count: 24, value: "Rp 45.2 M", icon: "OE" },
-  { name: "Network", count: 18, value: "Rp 22.8 M", icon: "NW" },
-  { name: "Heavy Equipment", count: 6, value: "Rp 147.0 M", icon: "HE" },
-  { name: "Electronics", count: 35, value: "Rp 98.4 M", icon: "EL" },
-  { name: "Building", count: 15, value: "Rp 320.0 M", icon: "BL" },
-  { name: "Electrical", count: 20, value: "Rp 15.6 M", icon: "EC" },
-  { name: "Furniture", count: 14, value: "Rp 28.9 M", icon: "FN" },
-  { name: "Software", count: 4, value: "Rp 24.8 M", icon: "SW" },
+const categories: SidebarItem[] = [
+  { name: "Server", count: 12, value: "Rp 8.4 M", avatar: "SR" },
+  { name: "Vehicle", count: 8, value: "Rp 437.6 M", avatar: "VH" },
+  { name: "Office Equipment", count: 24, value: "Rp 45.2 M", avatar: "OE" },
+  { name: "Network", count: 18, value: "Rp 22.8 M", avatar: "NW" },
+  { name: "Heavy Equipment", count: 6, value: "Rp 147.0 M", avatar: "HE" },
+  { name: "Electronics", count: 35, value: "Rp 98.4 M", avatar: "EL" },
+  { name: "Building", count: 15, value: "Rp 320.0 M", avatar: "BL" },
+  { name: "Electrical", count: 20, value: "Rp 15.6 M", avatar: "EC" },
+  { name: "Furniture", count: 14, value: "Rp 28.9 M", avatar: "FN" },
+  { name: "Software", count: 4, value: "Rp 24.8 M", avatar: "SW" },
 ];
 
-const recentActivities = [
+const recentActivities: Activity[] = [
   { user: "Rudi Hartono", action: "Added new asset VMware vSphere License", time: "2 hours ago", avatar: "RH" },
   { user: "Budi Santoso", action: "Scheduled maintenance for AC Central Daikin", time: "4 hours ago", avatar: "BS" },
   { user: "Ahmad Fauzi", action: "Disposed asset Meja Kantor Ergonomic", time: "1 day ago", avatar: "AF" },
@@ -113,54 +107,25 @@ export default function AssetsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Assets</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Track company assets, depreciation, and maintenance schedules.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Asset
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Assets"
+        description="Track company assets, depreciation, and maintenance schedules."
+        actions={
+          <>
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button size="sm">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Asset
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.title}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {s.title}
-              </CardTitle>
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <s.icon className="h-4 w-4 text-primary" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{s.value}</div>
-              <div className="mt-1 flex items-center gap-1 text-xs">
-                {s.trend === "up" ? (
-                  <ArrowUpRight className="h-3 w-3 text-emerald-500" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3 text-red-500" />
-                )}
-                <span className={s.trend === "up" ? "text-emerald-500" : "text-red-500"}>
-                  {s.change}
-                </span>
-                <span className="text-muted-foreground">vs last month</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <StatsGrid stats={stats} />
 
       {/* Table + Sidebar */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -253,9 +218,7 @@ export default function AssetsPage() {
                       <span className="text-muted-foreground">{asset.depreciation}</span>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className={`text-xs font-medium ${statusStyle(asset.status)}`}>
-                        {asset.status}
-                      </Badge>
+                      <StatusBadge status={asset.status} statusStyles={statusStyles} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -267,58 +230,18 @@ export default function AssetsPage() {
         {/* Categories + Activity */}
         <div className="space-y-6">
           {/* Categories */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Asset Categories</CardTitle>
-              <CardDescription>Value distribution by category</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {categories.map((cat) => (
-                  <div key={cat.name} className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8 rounded-lg border">
-                      <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-[11px] font-medium">
-                        {cat.icon}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{cat.name}</span>
-                        <span className="text-sm font-medium">{cat.value}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{cat.count} items</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <SidebarList
+            items={categories}
+            title="Asset Categories"
+            description="Value distribution by category"
+          />
 
           {/* Recent Activity */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>Latest asset management actions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-5">
-                {recentActivities.map((activity, i) => (
-                  <div key={i} className="flex gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                        {activity.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{activity.user}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{activity.action}</p>
-                      <p className="text-[11px] text-muted-foreground/60 mt-0.5">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <ActivityFeed
+            activities={recentActivities}
+            title="Recent Activity"
+            description="Latest asset management actions"
+          />
         </div>
       </div>
     </div>

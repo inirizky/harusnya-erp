@@ -38,7 +38,8 @@ yarn-error.log*
 
 # root markdown files (except README)
 /*.md
-.future-list.json
+feature_list.json
+init.sh
 !/README.md
 
 # vercel

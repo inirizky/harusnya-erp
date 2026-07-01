@@ -210,7 +210,7 @@ export default function AnalyticsPage() {
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `Rp${v / 1_000_000}Jt`} />
                 <Tooltip
-                  formatter={(value: number) => [`Rp ${(value / 1_000_000).toFixed(1)} Jt`, undefined]}
+                  formatter={(value) => `Rp ${(Number(value) / 1_000_000).toFixed(1)} Jt`}
                   contentStyle={{
                     borderRadius: "8px",
                     border: "1px solid hsl(var(--border))",
@@ -243,7 +243,7 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `Rp${v / 1_000_000}Jt`} />
                   <Tooltip
-                    formatter={(value: number) => [`Rp ${(value / 1_000_000).toFixed(1)} Jt`, "Revenue"]}
+                    formatter={(value) => [`Rp ${(Number(value) / 1_000_000).toFixed(1)} Jt`, "Revenue"]}
                     contentStyle={{
                       borderRadius: "8px",
                       border: "1px solid hsl(var(--border))",
@@ -275,7 +275,7 @@ export default function AnalyticsPage() {
                     outerRadius={100}
                     paddingAngle={4}
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   >
                     {categoryData.map((_, i) => (
                       <Cell key={i} fill={COLORS[i % COLORS.length]} />
