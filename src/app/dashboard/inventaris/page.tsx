@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Package,
   Warehouse,
@@ -6,6 +8,7 @@ import {
   Plus,
   Search,
 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
+import { ProductForm } from "@/components/forms/product-form";
 import { PageHeader, StatsGrid, StatusBadge, SidebarList } from "@/components/dashboard";
 import type { StatCardData, SidebarItem } from "@/components/dashboard";
 
@@ -90,6 +94,23 @@ const categories: SidebarItem[] = [
 ];
 
 export default function InventoryPage() {
+  const [productList, setProductList] = useState(inventory);
+
+  function handleProductCreated(
+    product: { name: string; sku: string; category: string; stock: number; minStock: number; warehouse: string; status: string }
+  ) {
+    const newItem = {
+      sku: product.sku,
+      name: product.name,
+      category: product.category,
+      stock: product.stock,
+      minStock: product.minStock,
+      warehouse: product.warehouse,
+      status: product.status,
+    } as typeof inventory[0];
+    setProductList((prev) => [newItem as any, ...prev]);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -102,10 +123,12 @@ export default function InventoryPage() {
               <Search className="mr-2 h-4 w-4" />
               Scan Barcode
             </Button>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Product
-            </Button>
+            <ProductForm onProductCreated={handleProductCreated}>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Product
+              </Button>
+            </ProductForm>
           </>
         }
       />
@@ -151,7 +174,7 @@ export default function InventoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {inventory.map((item) => (
+                {productList.map((item) => (
                   <TableRow key={item.sku}>
                     <TableCell>
                       <div>
